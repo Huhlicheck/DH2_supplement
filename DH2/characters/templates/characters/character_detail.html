@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ character.name }} - Details</title>
+</head>
+<body>
+    <h1>{{ character.name }}</h1>
+    <p><strong>Homeworld:</strong> {{ character.character_homeworld }}</p>
+    <p><strong>Background:</strong> {{ character.character_background }}</p>
+    <p><strong>Class:</strong> {{ character.character_class }}</p>
+    <p><strong>Experience to spend:</strong> {{ character.experience_to_spend }}</p>
+    <p><strong>Experience total:</strong> {{ character.experience_total }}</p>
+    <p><strong>Wounds:</strong> {{ character.wounds }}</p>
+    <p><strong>Fatigue:</strong> {{ character.fatigue }}</p>
+
+    <h2>Attributes</h2>
+    <ul>
+        {% for attribute in character.attributes.all %}
+            <li>{{ attribute.attribute_type.name }}: {{ attribute.value }}</li>
+        {% empty %}
+            <li>No attributes available.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Inventory</h2>
+    <ul>
+        {% for item in character.inventory.all %}
+            <li>{{ item.item.name }} - Quantity: {{ item.quantity }}{% if item.equipped %} (Equipped){% endif %}</li>
+        {% empty %}
+            <li>No items in inventory.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'character_list' %}">Back to Character List</a>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Characters</title>
+</head>
+<body>
+    <h1>Your Characters</h1>
+    {% if characters %}
+        <ul>
+            {% for character in characters %}
+                <li>
+                    <a href="{% url 'character_detail' character.name %}">{{ character.name }}</a>
+                    (Homeworld: {{ character.character_homeworld }}, Background: {{ character.character_class }}, Class: {{ character.character_class }}, Total Experience: {{ character.experience_total }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have not created any characters yet.</p>
+    {% endif %}
+</body>
+</html>
