@@ -5,6 +5,16 @@ from django.dispatch import receiver
 
 
 
+class Skill(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    level = models.PositiveIntegerField(default=1)  # Optional: level for the skill
+
+    def __str__(self):
+        return f"{self.name} (Level: {self.level})"
+    
+    
+
 class Character(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="characters")
@@ -16,6 +26,7 @@ class Character(models.Model):
     experience_total = models.PositiveIntegerField(default=0)
     wounds = models.IntegerField(default=0)
     fatigue = models.IntegerField(default=0)
+    skills = models.ManyToManyField(Skill, related_name="characters", blank=True)  # New field for skills
 
     class Meta:
         unique_together = ('name', 'player')  # Ensures unique character names per user

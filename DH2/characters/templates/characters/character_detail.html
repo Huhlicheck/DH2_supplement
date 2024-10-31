@@ -32,6 +32,17 @@
         {% endfor %}
     </ul>
 
+    <h2>Skills</h2>
+    <ul>
+        {% for skill in character.skills.all %}
+            <li>{{ skill.name }} - Level: {{ skill.level }}<br>
+            <em>{{ skill.description }}</em></li>
+        {% empty %}
+            <li>No skills assigned.</li>
+        {% endfor %}
+    </ul>
+
+
     <a href="{% url 'character_list' %}">Back to Character List</a>
 </body>
 </html>
