@@ -7,8 +7,7 @@ from django.dispatch import receiver
 
 class Skill(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    level = models.PositiveIntegerField(default=1)  # Optional: level for the skill
+    level = models.PositiveIntegerField(default=0)  # Optional: level for the skill
 
     def __str__(self):
         return f"{self.name} (Level: {self.level})"

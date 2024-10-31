@@ -34,11 +34,11 @@
 
     <h2>Skills</h2>
     <ul>
-        {% for skill in character.skills.all %}
+        {% for skill in skills %}
             <li>{{ skill.name }} - Level: {{ skill.level }}<br>
             <em>{{ skill.description }}</em></li>
         {% empty %}
-            <li>No skills assigned.</li>
+            <li>No skills learned.</li>
         {% endfor %}
     </ul>
 
