@@ -10,6 +10,5 @@ def character_list(request):
 
 @login_required
 def character_detail(request, character_name):
-    character = get_object_or_404(Character.objects.prefetch_related('skills'), name=character_name, player=request.user)
-    skills = character.skills.filter(level__gt=0)  # Only get skills with level > 0
+    character = get_object_or_404(Character, name=character_name, player=request.user)
     return render(request, 'characters/character_detail.html', {'character': character})

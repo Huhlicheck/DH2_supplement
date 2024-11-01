@@ -5,12 +5,7 @@ from django.dispatch import receiver
 
 
 
-class Skill(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    level = models.PositiveIntegerField(default=0)  # Optional: level for the skill
 
-    def __str__(self):
-        return f"{self.name} (Level: {self.level})"
     
     
 
@@ -25,7 +20,6 @@ class Character(models.Model):
     experience_total = models.PositiveIntegerField(default=0)
     wounds = models.IntegerField(default=0)
     fatigue = models.IntegerField(default=0)
-    skills = models.ManyToManyField(Skill, related_name="characters", blank=True)  # New field for skills
 
     class Meta:
         unique_together = ('name', 'player')  # Ensures unique character names per user
@@ -65,6 +59,25 @@ def create_default_attributes(sender, instance, created, **kwargs):
                 attribute_type=attribute_type,
                 value=attribute_type.default_value
             )
+
+
+# Keep the base Skill model as a reference for skill types
+class Skill(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    default_level = models.PositiveIntegerField(default=0)  # Default level for new skills
+
+    def __str__(self):
+        return self.name
+
+
+# Create a CharacterSkill model to link each character with specific skill levels
+class CharacterSkill(models.Model):
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="character_skills")
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="character_skills")
+    level = models.PositiveIntegerField(default=0)  # Level specific to this character
+
+    def __str__(self):
+        return f"{self.skill.name} (Level: {self.level}) - {self.character.name}"
 
 
 class Item(models.Model):

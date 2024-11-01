@@ -23,22 +23,21 @@
         {% endfor %}
     </ul>
 
+    <h2>Skills</h2>
+    <ul>
+        {% for skill in skills %}
+            <li>{{ skill.name }} - Level: {{ skill.level }}<br>
+        {% empty %}
+            <li>No skills learned.</li>
+        {% endfor %}
+    </ul>
+
     <h2>Inventory</h2>
     <ul>
         {% for item in character.inventory.all %}
             <li>{{ item.item.name }} - Quantity: {{ item.quantity }}{% if item.equipped %} (Equipped){% endif %}</li>
         {% empty %}
             <li>No items in inventory.</li>
-        {% endfor %}
-    </ul>
-
-    <h2>Skills</h2>
-    <ul>
-        {% for skill in skills %}
-            <li>{{ skill.name }} - Level: {{ skill.level }}<br>
-            <em>{{ skill.description }}</em></li>
-        {% empty %}
-            <li>No skills learned.</li>
         {% endfor %}
     </ul>
 
