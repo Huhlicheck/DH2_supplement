@@ -1,0 +1,25 @@
+<h1>{{ campaign.name }}</h1>
+<p>{{ campaign.description }}</p>
+
+<h2>Characters in Campaign</h2>
+<ul>
+    {% for character in characters %}
+        <li>{{ character.name }} - Experience to spend: {{ character.experience_to_spend }}</li>
+    {% endfor %}
+</ul>
+
+{% if is_master %}
+    <h2>Assign Experience Points</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="character_id">Character:</label>
+        <select name="character_id" id="character_id">
+            {% for character in characters %}
+                <option value="{{ character.id }}">{{ character.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="experience_points">Experience Points:</label>
+        <input type="number" name="experience_points" id="experience_points">
+        <button type="submit">Assign</button>
+    </form>
+{% endif %}

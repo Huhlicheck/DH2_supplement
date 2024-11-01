@@ -101,3 +101,31 @@ class CharacterItem(models.Model):
     def __str__(self):
         status = "Equipped" if self.equipped else "In Inventory"
         return f"{self.character.name} - {self.item.name} ({status})"
+
+
+
+class Campaign(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)
+    campaign_master = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="mastered_campaigns")
+    characters = models.ManyToManyField("Character", related_name="campaigns", blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def add_character(self, character):
+        """Adds a character to the campaign, if allowed."""
+        if character not in self.characters.all() and character.player != self.campaign_master:
+            self.characters.add(character)
+    
+    def remove_character(self, character):
+        """Removes a character from the campaign."""
+        if character in self.characters.all():
+            self.characters.remove(character)
+
+    def assign_experience(self, character, experience_points):
+        """Assigns experience points to a character if the user is the campaign master."""
+        if character in self.characters.all() and self.campaign_master != character.player:
+            character.experience_to_spend += experience_points
+            character.experience_total += experience_points
+            character.save()
