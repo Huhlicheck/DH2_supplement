@@ -55,7 +55,7 @@ ROOT_URLCONF = 'DH2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "DH2" /"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,5 +126,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect after successful login
 # Redirect after logout
 
-LOGIN_REDIRECT_URL = 'character_list'  
+LOGIN_REDIRECT_URL = 'characters:character_list'  
 LOGOUT_REDIRECT_URL = 'login'

@@ -10,7 +10,7 @@
         <ul>
             {% for character in characters %}
                 <li>
-                    <a href="{% url 'character_detail' character.name %}">{{ character.name }}</a>
+                    <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                     (Homeworld: {{ character.character_homeworld }}, Background: {{ character.character_class }}, Class: {{ character.character_class }}, Total Experience: {{ character.experience_total }})
                 </li>
             {% endfor %}
