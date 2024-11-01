@@ -9,3 +9,7 @@ class Command(BaseCommand):
         for skill in skills:
             Skill.objects.get_or_create(name=skill, default_value=0)
         self.stdout.write(self.style.SUCCESS("Default skills created successfully."))
+
+
+
+# not used yet
