@@ -19,6 +19,8 @@
         <p>You have not created any characters yet.</p>
     {% endif %}
 
+    <p><a href="{% url 'characters:create_character' %}">Create a New Character</a></p>
+
     <h1>Campaigns Involving Your Characters</h1>
     {% if campaigns_with_user_characters %}
         <ul>
