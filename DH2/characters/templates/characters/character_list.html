@@ -12,6 +12,10 @@
                 <li>
                     <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                     (Homeworld: {{ character.character_homeworld }}, Background: {{ character.character_class }}, Class: {{ character.character_class }}, Total Experience: {{ character.experience_total }})
+                    <form action="{% url 'characters:delete_character' character_name=character.name %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this character?');">Delete</button>
+                    </form>
                 </li>
             {% endfor %}
         </ul>

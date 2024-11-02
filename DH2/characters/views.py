@@ -39,6 +39,18 @@ def create_character(request):
 
 
 @login_required
+def delete_character(request, character_name):
+    character = get_object_or_404(Character, name=character_name, player=request.user)
+    
+    if request.method == "POST":
+        character.delete()
+        return redirect("characters:character_list")  # Redirect to the character list after deletion
+
+    # If someone tries to access the URL with GET, just redirect to the character list
+    return redirect("characters:character_list")
+
+
+@login_required
 def campaign_detail(request, campaign_name):
     campaign = get_object_or_404(Campaign, name=campaign_name)
     characters = campaign.characters.exclude(player=campaign.campaign_master) # Separate characters based on the campaign master and other players
