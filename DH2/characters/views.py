@@ -31,7 +31,7 @@ def create_character(request):
             character = form.save(commit=False)
             character.player = request.user  # Set the logged-in user as the character's player
             character.save()
-            return redirect("characters:character_list")  # Redirect to the character list after creation
+            return redirect("characters:character_detail", character_name=character.name)  # Redirect to the character detail after creation
     else:
         form = CharacterCreationForm()  # Show empty form for GET request
     
@@ -59,3 +59,17 @@ def campaign_detail(request, campaign_name):
         "is_master": is_master,
         "master_character": master_character,  # Pass the master's character separately
     })
+
+
+def create_campaign(request):
+    if request.method == "POST":
+        form = CampaignCreationForm(request.POST)
+        if form.is_valid():
+            character = form.save(commit=False)
+            character.player = request.user  # Set the logged-in user as the character's player
+            character.save()
+            return redirect("characters:character_list")  # Redirect to the character list after creation
+    else:
+        form = CampaignCreationForm()  # Show empty form for GET request
+    
+    return render(request, "characters/create_campaign.html", {"form": form})
