@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Campaign, Character
-from .forms import CharacterCreationForm
+from .forms import CharacterCreationForm, CampaignCreationForm
 
 @login_required
 def character_list(request):
@@ -73,15 +73,17 @@ def campaign_detail(request, campaign_name):
     })
 
 
+@login_required
 def create_campaign(request):
     if request.method == "POST":
         form = CampaignCreationForm(request.POST)
         if form.is_valid():
-            character = form.save(commit=False)
-            character.player = request.user  # Set the logged-in user as the character's player
-            character.save()
-            return redirect("characters:character_list")  # Redirect to the character list after creation
+            # Save the campaign, setting the campaign master to the current user
+            campaign = form.save(commit=False)
+            campaign.campaign_master = request.user
+            campaign.save()
+            return redirect("characters:campaign_detail", campaign_name=campaign.name)
     else:
-        form = CampaignCreationForm()  # Show empty form for GET request
-    
+        form = CampaignCreationForm()
+
     return render(request, "characters/create_campaign.html", {"form": form})

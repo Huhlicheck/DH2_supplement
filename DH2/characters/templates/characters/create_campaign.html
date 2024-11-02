@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Campaign</title>
+</head>
+<body>
+    {% block content %}
+    <h2>Create a New Campaign</h2>
+  
+    <form method="post" action="{% url 'characters:create_campaign' %}">
+      {% csrf_token %}
+      {{ form.as_p }}  <!-- Renders form fields with labels and validation errors -->
+  
+      <button type="submit" class="btn btn-primary">Create Campaign</button>
+    </form>
+    <p><a href="{% url 'characters:character_list' %}">Back to Character List</a></p>
+  {% endblock %}
+</body>
+</html>

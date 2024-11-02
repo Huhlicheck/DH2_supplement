@@ -46,5 +46,8 @@
     {% else %}
         <p>No campaigns with your characters.</p>
     {% endif %}
+
+    <p><a href="{% url 'characters:create_campaign' %}">Create a New Campaign</a></p>
+
 </body>
 </html>
