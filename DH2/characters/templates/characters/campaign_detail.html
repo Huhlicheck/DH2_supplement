@@ -1,5 +1,6 @@
 <h1>{{ campaign.name }}</h1>
 <p>{{ campaign.description }}</p>
+<p>Campaign Master: {{ campaign.campaign_master.username }}</p>
 
 <h2>Characters in Campaign</h2>
 <ul>
@@ -22,4 +23,11 @@
         <input type="number" name="experience_points" id="experience_points">
         <button type="submit">Assign</button>
     </form>
+{% endif %}
+
+{% if is_master and master_character %}
+    <h2>Your Character</h2>
+    <ul>
+        <li><a href="{% url 'characters:character_detail' master_character.name %}">{{ master_character.name }}</a></li>
+    </ul>
 {% endif %}

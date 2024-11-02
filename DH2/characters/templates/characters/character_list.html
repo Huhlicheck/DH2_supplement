@@ -6,9 +6,9 @@
 </head>
 <body>
     <h1>Your Characters</h1>
-    {% if characters %}
+    {% if user_characters %}
         <ul>
-            {% for character in characters %}
+            {% for character in user_characters %}
                 <li>
                     <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                     (Homeworld: {{ character.character_homeworld }}, Background: {{ character.character_class }}, Class: {{ character.character_class }}, Total Experience: {{ character.experience_total }})
@@ -17,6 +17,28 @@
         </ul>
     {% else %}
         <p>You have not created any characters yet.</p>
+    {% endif %}
+
+    <h1>Campaigns Involving Your Characters</h1>
+    {% if campaigns_with_user_characters %}
+        <ul>
+            {% for campaign in campaigns_with_user_characters %}
+                <li>
+                    <strong><a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a></strong>: {{ campaign.description }}
+                        <ul>
+                            {% for character in campaign.characters.all %}
+                            {% if character.player == request.user %}
+                                <li>
+                                    <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
+                                </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No campaigns with your characters.</p>
     {% endif %}
 </body>
 </html>
