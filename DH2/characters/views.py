@@ -73,7 +73,7 @@ def campaign_detail(request, campaign_name):
     is_master = request.user == campaign.campaign_master
 
     # Get characters in the campaign excluding the campaign master's character
-    campaign_characters = campaign.characters.exclude(player=campaign.campaign_master)
+    campaign_characters = campaign.characters.all
     master_character = campaign.characters.filter(player=campaign.campaign_master).first()
 
     # Pending requests (only visible to the campaign master)
