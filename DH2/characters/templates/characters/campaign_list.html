@@ -1,0 +1,28 @@
+<h1>All Campaigns</h1>
+
+{% if campaigns %}
+    <ul>
+        {% for campaign in campaigns %}
+            <li>
+                <strong><a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a></strong>
+                <p>{{ campaign.description }}</p>
+                
+                <p><em>Campaign Master: 
+                    {% if campaign.campaign_master %}
+                        {{ campaign.campaign_master.username }}
+                    {% else %}
+                        None
+                    {% endif %}
+                </em></p>
+                
+                <ul>
+                    {% for character in campaign.characters.all %}
+                        <li>{{ character.name }} ({{ character.character_class }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No campaigns available at the moment.</p>
+{% endif %}

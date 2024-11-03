@@ -15,11 +15,11 @@ def character_list(request):
     campaigns_mastered_by_user = Campaign.objects.filter(campaign_master=request.user)
 
     # Combine both querysets and remove duplicates
-    all_campaigns = campaigns_with_user_characters.union(campaigns_mastered_by_user)
+    all_campaigns_with_user = campaigns_with_user_characters.union(campaigns_mastered_by_user)
     
     return render(request, 'characters/character_list.html', {
         'user_characters': user_characters,
-        'all_campaigns': all_campaigns,
+        'all_campaigns': all_campaigns_with_user,
         'user_is_master': campaigns_mastered_by_user,
     })
 
@@ -55,6 +55,15 @@ def delete_character(request, character_name):
 
     # If someone tries to access the URL with GET, just redirect to the character list
     return redirect("characters:character_list")
+
+
+
+@login_required
+def campaign_list(request):
+    campaigns = Campaign.objects.all()
+    return render(request, "characters/campaign_list.html", {
+        "campaigns": campaigns,
+    })
 
 
 @login_required
