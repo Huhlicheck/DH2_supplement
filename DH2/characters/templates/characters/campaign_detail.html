@@ -14,6 +14,14 @@
     <ul>
         {% for character in campaign_characters %}
             <li>
+                <!-- Remove Character from Campaign Form -->
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_character">
+                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this character from the campaign?');">Remove</button>
+                </form>
+                
                 <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a> 
                 (Experience Total: {{ character.experience_total }})
                 
@@ -28,13 +36,7 @@
                         <button type="submit">Assign</button>
                     </form>
                     
-                    <!-- Remove Character from Campaign Form -->
-                    <form method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="remove_character">
-                        <input type="hidden" name="character_id" value="{{ character.id }}">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this character from the campaign?');">Remove</button>
-                    </form>
+
                 {% endif %}
             </li>
         {% endfor %}
@@ -44,7 +46,7 @@
         <h2>Assign Experience Points to All Characters</h2>
         <form method="post">
             {% csrf_token %}
-            <input type="hidden" name="action" value="assign_experience_to_all">
+            <input type="hidden" name="action" value="assign_experience_all">
             <label for="experience_points_all">Experience Points for All Characters:</label>
             <input type="number" name="experience_points" id="experience_points_all" required>
             <button type="submit">Assign to All Characters</button>

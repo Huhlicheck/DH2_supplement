@@ -139,7 +139,6 @@ class Campaign(models.Model):
 
     def assign_experience(self, character, experience_points):
         """Assigns experience points to a character if the user is the campaign master."""
-        if character in self.characters.all():
-            character.experience_to_spend += experience_points
-            character.experience_total += experience_points
-            character.save()
+        character.experience_to_spend += experience_points
+        character.experience_total += experience_points
+        character.save()

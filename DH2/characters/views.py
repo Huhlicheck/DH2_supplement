@@ -112,10 +112,10 @@ def campaign_detail(request, campaign_name):
             if action == "remove_character" and (character.player == request.user or is_master):
                 campaign.remove_character(character)
 
-        # Distribute experience to all non-master characters
-        if action == "assign_experience_all" and is_master:
-            for char in campaign_characters:
-                campaign.assign_experience(char, experience_points)
+            # Distribute experience to all non-master characters
+            if action == "assign_experience_all" and is_master:
+                for character in campaign_characters:
+                    campaign.assign_experience(character, experience_points)
 
         return redirect("characters:campaign_detail", campaign_name=campaign.name)
 
