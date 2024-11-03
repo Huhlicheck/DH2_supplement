@@ -25,12 +25,16 @@
 
     <p><a href="{% url 'characters:create_character' %}">Create a New Character</a></p>
 
-    <h1>Campaigns Involving Your Characters</h1>
+    <h1>Your Campaigns</h1>
     {% if campaigns_with_user_characters %}
         <ul>
             {% for campaign in campaigns_with_user_characters %}
                 <li>
                     <strong><a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a></strong>: {{ campaign.description }}
+                    <form action="{% url 'characters:delete_campaign' campaign_name=campaign.name %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this campaign?');">Delete</button>
+                    </form>
                         <ul>
                             {% for character in campaign.characters.all %}
                             {% if character.player == request.user %}

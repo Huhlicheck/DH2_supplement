@@ -87,3 +87,15 @@ def create_campaign(request):
         form = CampaignCreationForm()
 
     return render(request, "characters/create_campaign.html", {"form": form})
+
+
+@login_required
+def delete_campaign(request, campaign_name):
+    campaign = get_object_or_404(Campaign, name=campaign_name)
+    
+    if request.method == "POST":
+        campaign.delete()
+        return redirect("characters:character_list")  # Redirect to the character list after deletion
+
+    # If someone tries to access the URL with GET, just redirect to the character list
+    return redirect("characters:character_list")
