@@ -73,7 +73,7 @@ def campaign_detail(request, campaign_name):
     is_master = request.user == campaign.campaign_master
 
     # Get characters in the campaign excluding the campaign master's character
-    campaign_characters = campaign.characters.all
+    campaign_characters = campaign.characters.all()
     master_character = campaign.characters.filter(player=campaign.campaign_master).first()
 
     # Pending requests (only visible to the campaign master)
@@ -112,7 +112,7 @@ def campaign_detail(request, campaign_name):
             if action == "remove_character" and (character.player == request.user or is_master):
                 campaign.remove_character(character)
 
-            # Distribute experience to all non-master characters
+            # Distribute experience to all characters
             if action == "assign_experience_all" and is_master:
                 for character in campaign_characters:
                     campaign.assign_experience(character, experience_points)

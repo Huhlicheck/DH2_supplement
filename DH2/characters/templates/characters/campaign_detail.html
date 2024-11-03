@@ -21,7 +21,7 @@
                     <input type="hidden" name="character_id" value="{{ character.id }}">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this character from the campaign?');">Remove</button>
                 </form>
-                
+
                 <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a> 
                 (Experience Total: {{ character.experience_total }})
                 
@@ -35,24 +35,21 @@
                         <input type="number" name="experience_points" id="experience_points_{{ character.id }}" required>
                         <button type="submit">Assign</button>
                     </form>
-                    
-
                 {% endif %}
             </li>
         {% endfor %}
     </ul>
-    
     {% if is_master %}
-        <h2>Assign Experience Points to All Characters</h2>
+    <h2>Assign Experience Points to All Characters</h2>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="assign_experience_all">
-            <label for="experience_points_all">Experience Points for All Characters:</label>
-            <input type="number" name="experience_points" id="experience_points_all" required>
+            <input type="hidden" name="character_id" value="{{ character.id }}">
+            <label for="experience_points">Experience Points for All Characters:</label>
+            <input type="number" name="experience_points" id="experience_points_{{ character.id }}" required>
             <button type="submit">Assign to All Characters</button>
         </form>
     {% endif %}
-    
 
     <!-- Request to Join Campaign (for user's characters not in campaign) -->
     <h2>Your Characters To Join Campaign</h2>
