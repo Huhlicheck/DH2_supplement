@@ -69,7 +69,7 @@ def campaign_list(request):
 @login_required
 def campaign_detail(request, campaign_name):
     campaign = get_object_or_404(Campaign, name=campaign_name)
-    user_characters = Character.objects.filter(player=request.user)
+    user_characters = Character.objects.filter(player=request.user).exclude(id__in=campaign.characters.values_list('id', flat=True))
     is_master = request.user == campaign.campaign_master
 
     # Get characters in the campaign excluding the campaign master's character
