@@ -26,30 +26,43 @@
     <p><a href="{% url 'characters:create_character' %}">Create a New Character</a></p>
 
     <h1>Your Campaigns</h1>
-    {% if campaigns_with_user_characters %}
+
+    {% if all_campaigns %}
         <ul>
-            {% for campaign in campaigns_with_user_characters %}
+            {% for campaign in all_campaigns %}
                 <li>
-                    <strong><a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a></strong>: {{ campaign.description }}
-                    <form action="{% url 'characters:delete_campaign' campaign_name=campaign.name %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this campaign?');">Delete</button>
-                    </form>
-                        <ul>
-                            {% for character in campaign.characters.all %}
-                            {% if character.player == request.user %}
+                    <strong>
+                        <a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a>
+                    </strong>
+                    {% if campaign in user_is_master %}
+                        <span>(You are the campaign master)</span>
+                    {% endif %}
+                    : {{ campaign.description }}
+                    
+                    {% if campaign in user_is_master %}
+                        <!-- Show delete button for campaigns the user masters -->
+                        <form action="{% url 'characters:delete_campaign' campaign_name=campaign.name %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this campaign?');">Delete</button>
+                        </form>
+                    {% endif %}
+                    
+                    <ul>
+                        {% for character in campaign.characters.all %}
+                            {% if character.player == request.user or campaign not in user_is_master %}
                                 <li>
                                     <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                                 </li>
                             {% endif %}
-                            {% endfor %}
-                        </ul>
+                        {% endfor %}
+                    </ul>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>No campaigns with your characters.</p>
+        <p>No campaigns to display.</p>
     {% endif %}
+    
 
     <p><a href="{% url 'characters:create_campaign' %}">Create a New Campaign</a></p>
 
