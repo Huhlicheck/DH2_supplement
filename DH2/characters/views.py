@@ -69,23 +69,63 @@ def campaign_list(request):
 @login_required
 def campaign_detail(request, campaign_name):
     campaign = get_object_or_404(Campaign, name=campaign_name)
-    characters = campaign.characters.exclude(player=campaign.campaign_master) # Separate characters based on the campaign master and other players
-    master_character = campaign.characters.filter(player=campaign.campaign_master).first()  # Get master's character if it exists
-    is_master = request.user == campaign.campaign_master  # Check if the user is the campaign master
+    user_characters = Character.objects.filter(player=request.user)
+    is_master = request.user == campaign.campaign_master
+
+    # Get characters in the campaign excluding the campaign master's character
+    campaign_characters = campaign.characters.exclude(player=campaign.campaign_master)
+    master_character = campaign.characters.filter(player=campaign.campaign_master).first()
+
+    # Pending requests (only visible to the campaign master)
+    pending_requests = campaign.pending_requests.all() if is_master else None
 
 
-    if request.method == "POST" and is_master:
+    if request.method == "POST":
         character_id = request.POST.get("character_id")
-        experience_points = int(request.POST.get("experience_points"))
-        character = get_object_or_404(Character, id=character_id)
-        campaign.assign_experience(character, experience_points)
+        action = request.POST.get("action")
+        experience_points = request.POST.get("experience_points")
+
+        # Ensure experience points is a valid integer, defaulting to 0 if not provided
+        try:
+            experience_points = int(experience_points)
+        except (TypeError, ValueError):
+            experience_points = 0
+
+        # Handle individual character actions
+        if character_id:
+            character = get_object_or_404(Character, id=character_id)
+
+            if action == "assign_experience" and is_master:
+                # Assign experience to individual character
+                campaign.assign_experience(character, experience_points)
+
+            elif action == "request_to_join" and character.player == request.user:
+                campaign.request_to_join(character)
+
+            elif is_master:
+                if action == "approve_request":
+                    campaign.approve_request(character)
+                elif action == "decline_request":
+                    campaign.decline_request(character)
+
+            # Remove character (either by owner or master)
+            if action == "remove_character" and (character.player == request.user or is_master):
+                campaign.remove_character(character)
+
+        # Distribute experience to all non-master characters
+        if action == "assign_experience_all" and is_master:
+            for char in campaign_characters:
+                campaign.assign_experience(char, experience_points)
+
         return redirect("characters:campaign_detail", campaign_name=campaign.name)
 
     return render(request, "characters/campaign_detail.html", {
         "campaign": campaign,
-        "characters": characters,
+        "user_characters": user_characters,
+        "campaign_characters": campaign_characters,
         "is_master": is_master,
-        "master_character": master_character,  # Pass the master's character separately
+        "master_character": master_character,
+        "pending_requests": pending_requests,
     })
 
 

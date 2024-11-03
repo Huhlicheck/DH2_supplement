@@ -109,6 +109,7 @@ class Campaign(models.Model):
     description = models.TextField(blank=True, null=True)
     campaign_master = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="mastered_campaigns")
     characters = models.ManyToManyField("Character", related_name="campaigns", blank=True)
+    pending_requests = models.ManyToManyField("Character", related_name="pending_campaign_requests", blank=True)
 
     def __str__(self):
         return self.name
@@ -122,6 +123,19 @@ class Campaign(models.Model):
         """Removes a character from the campaign."""
         if character in self.characters.all():
             self.characters.remove(character)
+
+    def request_to_join(self, character):
+        if character not in self.characters.all() and character not in self.pending_requests.all():
+            self.pending_requests.add(character)
+
+    def approve_request(self, character):
+        if character in self.pending_requests.all():
+            self.pending_requests.remove(character)
+            self.characters.add(character)
+
+    def decline_request(self, character):
+        if character in self.pending_requests.all():
+            self.pending_requests.remove(character)
 
     def assign_experience(self, character, experience_points):
         """Assigns experience points to a character if the user is the campaign master."""

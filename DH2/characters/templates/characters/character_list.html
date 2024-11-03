@@ -27,9 +27,9 @@
 
     <h1>Your Campaigns</h1>
 
-    {% if all_campaigns_with_user %}
+    {% if all_campaigns %}
         <ul>
-            {% for campaign in all_campaigns_with_user %}
+            {% for campaign in all_campaigns %}
                 <li>
                     <strong>
                         <a href="{% url 'characters:campaign_detail' campaign.name %}">{{ campaign.name }}</a>

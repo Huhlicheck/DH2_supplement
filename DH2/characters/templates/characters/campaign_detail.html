@@ -1,35 +1,91 @@
-<h1>{{ campaign.name }}</h1>
-<p>{{ campaign.description }}</p>
-<p>Campaign Master: {{ campaign.campaign_master.username }}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Characters</title>
+</head>
+<body>
+    {% block content %}
+    <h1>{{ campaign.name }}</h1>
+    <p>{{ campaign.description }}</p>
+    <p>Campaign Master: {{ campaign.campaign_master.username }}</p>
 
-<h2>Characters in Campaign</h2>
-<ul>
-    {% for character in characters %}
-        <li>{{ character.name }} - Experience to spend: {{ character.experience_to_spend }}</li>
-    {% endfor %}
-</ul>
-
-{% if is_master %}
-    <h2>Assign Experience Points</h2>
-    <form method="post">
-        {% csrf_token %}
-        <label for="character_id">Character:</label>
-        <select name="character_id" id="character_id">
-            {% for character in characters %}
-                <option value="{{ character.id }}">{{ character.name }}</option>
-            {% endfor %}
-        </select>
-        <label for="experience_points">Experience Points:</label>
-        <input type="number" name="experience_points" id="experience_points">
-        <button type="submit">Assign</button>
-    </form>
-{% endif %}
-
-{% if is_master and master_character %}
-    <h2>Your Character</h2>
+    <h2>Characters in Campaign</h2>
     <ul>
-        <li><a href="{% url 'characters:character_detail' master_character.name %}">{{ master_character.name }}</a></li>
+        {% for character in campaign_characters %}
+            <li>{{ character.name }} (Experience Total: {{ character.experience_total }})</li>
+        {% endfor %}
     </ul>
-{% endif %}
+
+    <!-- Assign Experience Points Form (Master only) -->
+    {% if is_master %}
+        <h2>Assign Experience Points</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign_experience">
+            <label for="character_id">Select Character:</label>
+            <select name="character_id" id="character_id">
+                {% for character in campaign_characters %}
+                    <option value="{{ character.id }}">{{ character.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="experience_points">Experience Points:</label>
+            <input type="number" name="experience_points" required>
+            <button type="submit">Assign to Selected Character</button>
+        </form>
+
+        <form method="post" style="margin-top: 10px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign_experience_to_all">
+            <label for="experience_points_all">Experience Points for All Characters:</label>
+            <input type="number" name="experience_points" id="experience_points_all" required>
+            <button type="submit">Assign to All Non-Master Characters</button>
+        </form>
+    {% endif %}
+
+    <!-- Request to Join Campaign (for user's characters not in campaign) -->
+    <h2>Your Characters Not in Campaign</h2>
+    <ul>
+        {% for character in user_characters %}
+            <li>
+                {{ character.name }}
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="request_to_join">
+                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                    <button type="submit">Request to Join</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pending Requests (Master only) -->
+    {% if is_master and pending_requests %}
+        <h2>Pending Join Requests</h2>
+        <ul>
+            {% for request in pending_requests %}
+                <li>
+                    {{ request.character.name }} (from {{ request.character.player.username }})
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve_request">
+                        <input type="hidden" name="character_id" value="{{ request.character.id }}">
+                        <button type="submit">Approve</button>
+                    </form>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="decline_request">
+                        <input type="hidden" name="character_id" value="{{ request.character.id }}">
+                        <button type="submit">Decline</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% endblock %}
 
 <p><a href="{% url 'characters:character_list' %}">Back to Character List</a></p>
+
+</body>
+</html>
