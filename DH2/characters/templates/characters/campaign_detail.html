@@ -48,7 +48,7 @@
     <ul>
         {% for character in user_characters %}
             <li>
-                {{ character.name }}
+                <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                 <form method="post" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="request_to_join">
@@ -65,17 +65,17 @@
         <ul>
             {% for request in pending_requests %}
                 <li>
-                    {{ request.character.name }} (from {{ request.character.player.username }})
+                    <a href="{% url 'characters:character_detail' request.name %}">{{ request.name }}</a> (from {{ request.player.username }})
                     <form method="post" style="display:inline;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="approve_request">
-                        <input type="hidden" name="character_id" value="{{ request.character.id }}">
+                        <input type="hidden" name="character_id" value="{{ request.id }}">
                         <button type="submit">Approve</button>
                     </form>
                     <form method="post" style="display:inline;">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="decline_request">
-                        <input type="hidden" name="character_id" value="{{ request.character.id }}">
+                        <input type="hidden" name="character_id" value="{{ request.id }}">
                         <button type="submit">Decline</button>
                     </form>
                 </li>
