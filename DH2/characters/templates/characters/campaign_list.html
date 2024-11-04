@@ -17,7 +17,7 @@
                 
                 <ul>
                     {% for character in campaign.characters.all %}
-                        <li>{{ character.name }} ({{ character.character_class }})</li>
+                        <li>{{ character.name }} ({{ character.player }})</li>
                     {% endfor %}
                 </ul>
             </li>

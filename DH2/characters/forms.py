@@ -4,7 +4,7 @@ from .models import Character, Campaign
 class CharacterCreationForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'character_homeworld', 'character_background', 'character_class']
+        fields = ['name', 'character_homeworld', 'character_background', 'character_role']
  
 
 class CampaignCreationForm(forms.ModelForm):

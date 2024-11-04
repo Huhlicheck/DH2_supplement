@@ -2,11 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 
 
 
-    
+class Aptitude(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
     
 
 class Character(models.Model):
@@ -14,8 +21,8 @@ class Character(models.Model):
     player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="characters")
     character_homeworld = models.CharField(max_length=255, null=False, blank=False)
     character_background = models.CharField(max_length=255, null=False, blank=False)
-    character_class = models.CharField(max_length=255, null=False, blank=False)
-    character_aptitudes = models.CharField(max_length=255)
+    character_role = models.CharField(max_length=255, null=False, blank=False)
+    aptitudes = models.ManyToManyField(Aptitude, related_name="characters", blank=True)
     experience_to_spend = models.PositiveIntegerField(default=0)
     experience_total = models.PositiveIntegerField(default=0)
     wounds = models.IntegerField(default=0)
@@ -25,7 +32,7 @@ class Character(models.Model):
         unique_together = ('name', 'player')  # Ensures unique character names per user
 
     def __str__(self):
-        return f"{self.name} ({self.character_homeworld}, {self.character_background}, {self.character_class})"
+         return f"{self.name} ({self.player.username})"
     
 
 
@@ -60,24 +67,91 @@ def create_default_attributes(sender, instance, created, **kwargs):
                 value=attribute_type.default_value
             )
 
+            
+@receiver(post_save, sender=Character)
+def add_general_aptitude(sender, instance, created, **kwargs):
+    if created:
+        general_aptitude, _ = Aptitude.objects.get_or_create(name="General")
+        instance.aptitudes.add(general_aptitude)
 
-# Keep the base Skill model as a reference for skill types
+
 class Skill(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    default_level = models.PositiveIntegerField(default=0)  # Default level for new skills
+    description = models.TextField(blank=True, null=True)
+    default_level = models.IntegerField(default=-10)  # Starting level for new skills (-10)
+
+    # Each skill has two aptitudes that provide a discount
+    primary_aptitude = models.ForeignKey(
+        'Aptitude', on_delete=models.SET_NULL, null=True, related_name='primary_skills'
+    )
+    secondary_aptitude = models.ForeignKey(
+        'Aptitude', on_delete=models.SET_NULL, null=True, related_name='secondary_skills'
+    )
 
     def __str__(self):
         return self.name
 
 
-# Create a CharacterSkill model to link each character with specific skill levels
 class CharacterSkill(models.Model):
-    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="character_skills")
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="character_skills")
-    level = models.PositiveIntegerField(default=0)  # Level specific to this character
+    LEVEL_COSTS = {
+        0: (300, 200, 100),
+        10: (600, 400, 200),
+        20: (900, 600, 300),
+        30: (1200, 800, 400),
+    }
+
+    character = models.ForeignKey('Character', on_delete=models.CASCADE, related_name='skills')
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='character_skills')
+    level = models.IntegerField(default=-10)  # Levels: -10, 0, 10, 20, 30
+
+    class Meta:
+        unique_together = ('character', 'skill')  # Ensure a unique skill per character
 
     def __str__(self):
-        return f"{self.skill.name} (Level: {self.level}) - {self.character.name}"
+        return f"{self.character}'s {self.skill.name} at level {self.level}"
+
+    def get_upgrade_cost(self, character):
+        """
+        Calculate the experience cost for upgrading the skill level based on character's aptitudes.
+        """
+        next_level = self.level + 10
+        if next_level not in CharacterSkill.LEVEL_COSTS:
+            raise ValidationError("Maximum skill level reached.")
+
+        # Base cost for moving to the next level
+        base_cost, one_aptitude_cost, both_aptitude_cost = CharacterSkill.LEVEL_COSTS[next_level]
+
+        # Check character aptitudes
+        aptitudes = character.aptitudes.values_list('id', flat=True)
+        if (self.skill.primary_aptitude_id in aptitudes) and (self.skill.secondary_aptitude_id in aptitudes):
+            return both_aptitude_cost  # Discount if both aptitudes match
+        elif (self.skill.primary_aptitude_id in aptitudes) or (self.skill.secondary_aptitude_id in aptitudes):
+            return one_aptitude_cost  # Partial discount if one aptitude matches
+        return base_cost  # No discount
+
+    def increase_level(self, character):
+        """
+        Increase the skill level, if possible, and deduct experience points.
+        """
+        if self.level >= 30:
+            raise ValidationError("Skill is already at maximum level.")
+        
+        # Calculate the cost
+        experience_cost = self.get_upgrade_cost(character)
+
+        # Check if character has enough experience
+        if character.experience_to_spend < experience_cost:
+            raise ValidationError("Not enough experience points.")
+
+        # Deduct experience points and increase the level
+        character.experience_to_spend -= experience_cost
+        self.level += 10
+        character.save()
+        self.save()
+        return experience_cost  # Return the cost for reference
+
+
+
 
 
 class Item(models.Model):
