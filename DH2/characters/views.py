@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Campaign, Character
+from .models import Campaign, Character, Skill, CharacterSkill
 from .forms import CharacterCreationForm, CampaignCreationForm
 
 @login_required
@@ -27,7 +29,57 @@ def character_list(request):
 @login_required
 def character_detail(request, character_name):
     character = get_object_or_404(Character, name=character_name, player=request.user)
-    return render(request, 'characters/character_detail.html', {'character': character})
+    
+  # Filter CharacterSkill instances for the character with level >= 0
+    visible_skills = CharacterSkill.objects.filter(character=character, level__gte=0)
+
+    context = {
+        "character": character,
+        "visible_skills": visible_skills,
+    }
+    return render(request, "characters/character_detail.html", context)
+
+
+
+@login_required
+def skill_upgrade_list(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    skills = Skill.objects.all()  # Get all skills
+
+    # Get CharacterSkill levels if they exist, otherwise default to -10 (untrained)
+    character_skills = {
+        skill.id: skill.character_skills.filter(character=character).first() for skill in skills
+    }
+
+    if request.method == "POST":
+        skill_id = request.POST.get("skill_id")
+        skill = get_object_or_404(Skill, id=skill_id)
+
+        # Get or create the CharacterSkill instance for the selected skill
+        character_skill, created = CharacterSkill.objects.get_or_create(character=character, skill=skill)
+
+        try:
+            # Attempt to increase the skill level
+            experience_cost = character_skill.increase_level()
+            
+            # Display success message
+            messages.success(
+                request, 
+                f"Successfully upgraded {skill.name} to level {character_skill.level}. Cost: {experience_cost} XP."
+            )
+
+        except ValidationError as e:
+            # Handle errors (e.g., not enough experience or max level reached)
+            messages.error(request, str(e))
+        
+        return redirect("characters:skill_upgrade_list", character_id=character.id)
+
+    context = {
+        "character": character,
+        "skills": skills,
+        "character_skills": character_skills,
+    }
+    return render(request, "characters/skill_upgrade_list.html", context)
 
 
 @login_required

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ character.name }} - Skills</title>
+</head>
+<body>
+    <a href="{% url 'characters:character_detail' character.name %}">Back to Character</a>
+    {% block content %}
+    <h2>{{ character.name }}'s Skills</h2>
+    <p>Available Experience: {{ character.experience_to_spend }} XP</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Skill</th>
+                <th>Current Level</th>
+                <th>Upgrade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in skills %}
+                {% with character_skill=character_skills|default_if_none:None %}
+                <tr>
+                    <td>{{ skill.name }}</td>
+                    <td>
+                        {% if character_skill %}
+                            {{ character_skill.level }}
+                        {% else %}
+                            -10
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if character_skill and character_skill.level >= 30 %}
+                            <span>Max Level</span>
+                        {% else %}
+                            <form action="{% url 'characters:skill_upgrade_list' character.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="skill_id" value="{{ skill.id }}">
+                                <button type="submit">Increase Level</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% endblock %}
+</body> 
+</html>
+  

@@ -25,12 +25,11 @@
 
     <h2>Skills</h2>
     <ul>
-        {% for skill in skills %}
-            <li>{{ skill.name }} - Level: {{ skill.level }}<br>
-        {% empty %}
-            <li>No skills learned.</li>
+        {% for skill in visible_skills %}
+            <li>{{ skill.name }} (Level: {{ skill.level }})</li>
         {% endfor %}
     </ul>
+    <a href="{% url 'characters:skill_upgrade_list' character.id %}">Purchase/Increase Skills</a>
 
     <h2>Inventory</h2>
     <ul>

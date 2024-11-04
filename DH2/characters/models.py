@@ -110,7 +110,7 @@ class CharacterSkill(models.Model):
     def __str__(self):
         return f"{self.character}'s {self.skill.name} at level {self.level}"
 
-    def get_upgrade_cost(self, character):
+    def get_upgrade_cost(self):
         """
         Calculate the experience cost for upgrading the skill level based on character's aptitudes.
         """
@@ -122,14 +122,14 @@ class CharacterSkill(models.Model):
         base_cost, one_aptitude_cost, both_aptitude_cost = CharacterSkill.LEVEL_COSTS[next_level]
 
         # Check character aptitudes
-        aptitudes = character.aptitudes.values_list('id', flat=True)
+        aptitudes = self.character.aptitudes.values_list('id', flat=True)
         if (self.skill.primary_aptitude_id in aptitudes) and (self.skill.secondary_aptitude_id in aptitudes):
             return both_aptitude_cost  # Discount if both aptitudes match
         elif (self.skill.primary_aptitude_id in aptitudes) or (self.skill.secondary_aptitude_id in aptitudes):
             return one_aptitude_cost  # Partial discount if one aptitude matches
         return base_cost  # No discount
 
-    def increase_level(self, character):
+    def increase_level(self):
         """
         Increase the skill level, if possible, and deduct experience points.
         """
@@ -137,16 +137,16 @@ class CharacterSkill(models.Model):
             raise ValidationError("Skill is already at maximum level.")
         
         # Calculate the cost
-        experience_cost = self.get_upgrade_cost(character)
+        experience_cost = self.get_upgrade_cost()
 
         # Check if character has enough experience
-        if character.experience_to_spend < experience_cost:
+        if self.character.experience_to_spend < experience_cost:
             raise ValidationError("Not enough experience points.")
 
         # Deduct experience points and increase the level
-        character.experience_to_spend -= experience_cost
+        self.character.experience_to_spend -= experience_cost
         self.level += 10
-        character.save()
+        self.character.save()
         self.save()
         return experience_cost  # Return the cost for reference
 

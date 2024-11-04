@@ -12,4 +12,5 @@ urlpatterns = [
     path("campaign/delete/<str:campaign_name>/", views.delete_campaign, name="delete_campaign"),
     path('campaign/<str:campaign_name>/', views.campaign_detail, name='campaign_detail'),
     path("<str:character_name>/", views.character_detail, name="character_detail"),
+    path('<int:character_id>/skill_upgrade_list/', views.skill_upgrade_list, name='skill_upgrade_list'),
 ]
