@@ -19,19 +19,12 @@
             </tr>
         </thead>
         <tbody>
-            {% for skill in skills %}
-                {% with character_skill=character_skills|default_if_none:None %}
+            {% for skill, character_skill in skill_data %}
                 <tr>
                     <td>{{ skill.name }}</td>
+                    <td>{{ character_skill.level }}</td>
                     <td>
-                        {% if character_skill %}
-                            {{ character_skill.level }}
-                        {% else %}
-                            -10
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if character_skill and character_skill.level >= 30 %}
+                        {% if character_skill.level >= 30 %}
                             <span>Max Level</span>
                         {% else %}
                             <form action="{% url 'characters:skill_upgrade_list' character.id %}" method="post">
@@ -42,7 +35,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% endwith %}
             {% endfor %}
         </tbody>
     </table>
@@ -50,4 +42,3 @@
     {% endblock %}
 </body> 
 </html>
-  

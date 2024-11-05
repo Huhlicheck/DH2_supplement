@@ -46,10 +46,11 @@ def skill_upgrade_list(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     skills = Skill.objects.all()  # Get all skills
 
-    # Get CharacterSkill levels if they exist, otherwise default to -10 (untrained)
-    character_skills = {
-        skill.id: skill.character_skills.filter(character=character).first() for skill in skills
-    }
+    # Create a list of (skill, character_skill) pairs
+    skill_data = [
+        (skill, character.skills.filter(skill=skill).first() or CharacterSkill(skill=skill, character=character))
+        for skill in skills
+    ]
 
     if request.method == "POST":
         skill_id = request.POST.get("skill_id")
@@ -76,8 +77,7 @@ def skill_upgrade_list(request, character_id):
 
     context = {
         "character": character,
-        "skills": skills,
-        "character_skills": character_skills,
+        "skill_data": skill_data,  # Pass the list of (skill, character_skill) pairs
     }
     return render(request, "characters/skill_upgrade_list.html", context)
 
