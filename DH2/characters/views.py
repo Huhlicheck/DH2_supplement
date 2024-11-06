@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Campaign, Character, Role, Skill, CharacterSkill, Aptitude
+from .models import Campaign, Character, Skill, CharacterSkill
 from .forms import CharacterCreationForm, CampaignCreationForm
 
 @login_required
@@ -86,31 +86,13 @@ def skill_upgrade_list(request, character_id):
 @login_required
 def create_character(request):
     if request.method == "POST":
-        role_id = request.POST.get("character_role")
-        role = Role.objects.get(id=role_id)
-        
-        # Pass the selected role to the form
-        form = CharacterCreationForm(request.POST, initial={'role': role})
-        
+        form = CharacterCreationForm(request.POST)
         if form.is_valid():
             character = form.save(commit=False)
             character.player = request.user
             character.save()
-            form.save_m2m()  # Ensure Many-to-Many relationships are saved
-            
-            # Process and save the chosen aptitudes for the character
-            selected_aptitudes = [
-                form.cleaned_data.get(f'aptitude_choice_{i}')
-                for i in range(len(role.aptitudes.all()))
-                if form.cleaned_data.get(f'aptitude_choice_{i}')
-            ]
-            
-            # Attach each chosen aptitude to the character
-            for aptitude_name in selected_aptitudes:
-                aptitude = Aptitude.objects.get(name=aptitude_name)
-                character.aptitudes.add(aptitude)
-
-            # Redirect to character detail view
+            # Assign role aptitudes to the character
+            character.assign_role_aptitudes()
             return redirect("characters:character_detail", character_name=character.name)
     else:
         form = CharacterCreationForm()
