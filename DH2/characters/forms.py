@@ -1,27 +1,41 @@
 from django import forms
-from .models import Character, Campaign, Role
+from .models import Character, Campaign, Role, Aptitude
 
 class CharacterCreationForm(forms.ModelForm):
-    role = forms.ModelChoiceField(queryset=Role.objects.all(), required=True, label="Select Role")
+    character_role = forms.ModelChoiceField(queryset=Role.objects.all(), required=True, label="Select Role")
 
     class Meta:
         model = Character
-        fields = ['name', 'character_homeworld', 'character_background']
+        fields = ['name', 'character_homeworld', 'character_background', 'character_role']  # Use 'character_role' here
 
-    # Dynamically add fields based on available aptitude choices
     def __init__(self, *args, **kwargs):
-        selected_role = kwargs.pop('role', None)
         super().__init__(*args, **kwargs)
 
+        selected_role = self.initial.get('role')
+        
         if selected_role:
             # Iterate over aptitude choices
             for index, aptitude_choices in enumerate(selected_role.aptitudes.all()):
-                if len(aptitude_choices) > 1:
+                if aptitude_choices.count() > 1:
                     # If multiple aptitudes, create a choice field
                     self.fields[f'aptitude_choice_{index}'] = forms.ChoiceField(
-                        choices=[(apt.name, apt.name) for apt in aptitude_choices],
+                        choices=[(apt.id, apt.name) for apt in aptitude_choices],
                         label=f"Choose aptitude ({' or '.join([apt.name for apt in aptitude_choices])})"
                     )
+
+    def save(self, commit=True):
+        character = super().save(commit=False)
+        character.character_role = self.cleaned_data['character_role']  # Use 'character_role' here
+
+        if commit:
+            character.save()
+            # Assign selected aptitudes to character after saving
+            for field_name, aptitude_id in self.cleaned_data.items():
+                if field_name.startswith('aptitude_choice_') and aptitude_id:
+                    aptitude = Aptitude.objects.get(id=aptitude_id)
+                    character.aptitudes.add(aptitude)
+
+        return character
 
  
 

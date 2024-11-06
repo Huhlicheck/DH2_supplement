@@ -14,6 +14,15 @@
     <p><strong>Wounds:</strong> {{ character.wounds }}</p>
     <p><strong>Fatigue:</strong> {{ character.fatigue }}</p>
 
+    <h2>Aptitudes</h2>
+    <ul>
+        {% for aptitude in character.character_role.aptitudes.all %}
+            <li>{{ aptitude.name }}</li>
+        {% empty %}
+            <li>No aptitudes available.</li>
+        {% endfor %}
+    </ul>
+
     <h2>Attributes</h2>
     <ul>
         {% for attribute in character.attributes.all %}
@@ -39,7 +48,6 @@
             <li>No items in inventory.</li>
         {% endfor %}
     </ul>
-
 
     <a href="{% url 'characters:character_list' %}">Back to Character List</a>
 </body>
