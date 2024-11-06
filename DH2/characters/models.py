@@ -14,14 +14,22 @@ class Aptitude(models.Model):
         return self.name
 
 
-    
+class Role(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    role_bonus = models.TextField(blank=True, null=True)
+    aptitudes = models.ManyToManyField(Aptitude, related_name="roles")
+
+    def __str__(self):
+        return self.name   
+
+
 
 class Character(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="characters")
     character_homeworld = models.CharField(max_length=255, null=False, blank=False)
     character_background = models.CharField(max_length=255, null=False, blank=False)
-    character_role = models.CharField(max_length=255, null=False, blank=False)
+    character_role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name="characters")
     aptitudes = models.ManyToManyField(Aptitude, related_name="characters", blank=True)
     experience_to_spend = models.PositiveIntegerField(default=0)
     experience_total = models.PositiveIntegerField(default=0)
@@ -32,8 +40,13 @@ class Character(models.Model):
         unique_together = ('name', 'player')  # Ensures unique character names per user
 
     def __str__(self):
-         return f"{self.name} ({self.player.username})"
-    
+        return f"{self.name} ({self.player.username})"
+
+    def assign_role_aptitudes(self):
+        """Assigns the aptitudes from the selected role to the character."""
+        if self.character_role:
+            self.aptitudes.set(self.character_role.aptitudes.all())
+
 
 
 

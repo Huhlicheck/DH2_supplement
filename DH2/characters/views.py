@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Campaign, Character, Skill, CharacterSkill
+from .models import Campaign, Character, Role, Skill, CharacterSkill
 from .forms import CharacterCreationForm, CampaignCreationForm
 
 @login_required
@@ -82,19 +82,27 @@ def skill_upgrade_list(request, character_id):
     return render(request, "characters/skill_upgrade_list.html", context)
 
 
+
 @login_required
 def create_character(request):
     if request.method == "POST":
+        role_id = request.POST.get("role")
+        role = Role.objects.get(id=role_id)
         form = CharacterCreationForm(request.POST)
         if form.is_valid():
+             # Process the selected role and chosen aptitudes
+            selected_aptitudes = [form.cleaned_data.get(f'aptitude_choice_{i}') for i in range(len(role.aptitudes.all()))]
             character = form.save(commit=False)
-            character.player = request.user  # Set the logged-in user as the character's player
+            character.player = request.user
             character.save()
-            return redirect("characters:character_detail", character_name=character.name)  # Redirect to the character detail after creation
+            # Assign role aptitudes to the character
+            character.assign_role_aptitudes()
+            return redirect("characters:character_detail", character_name=character.name)
     else:
-        form = CharacterCreationForm()  # Show empty form for GET request
-    
+        form = CharacterCreationForm()
+
     return render(request, "characters/create_character.html", {"form": form})
+
 
 
 @login_required
