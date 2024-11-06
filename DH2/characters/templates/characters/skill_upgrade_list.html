@@ -15,6 +15,7 @@
             <tr>
                 <th>Skill</th>
                 <th>Current Level</th>
+                <th>Experience Cost</th>
                 <th>Upgrade</th>
             </tr>
         </thead>
@@ -27,11 +28,18 @@
                         {% if character_skill.level >= 30 %}
                             <span>Max Level</span>
                         {% else %}
+                            <span>{{ character_skill.get_upgrade_cost }} XP</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if character_skill.level < 30 and character.experience_to_spend >= character_skill.get_upgrade_cost %}
                             <form action="{% url 'characters:skill_upgrade_list' character.id %}" method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="skill_id" value="{{ skill.id }}">
                                 <button type="submit">Increase Level</button>
                             </form>
+                        {% elif character_skill.level < 30 %}
+                            <span>Not enough XP</span>
                         {% endif %}
                     </td>
                 </tr>
