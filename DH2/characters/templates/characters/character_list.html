@@ -26,7 +26,6 @@
         <p>You have not created any characters yet.</p>
     {% endif %}
 
-    <p><a href="{% url 'characters:create_character' %}" class="btn btn-primary">Create a New Character</a></p>
 
     <h1>Your Campaigns</h1>
 
@@ -65,8 +64,5 @@
         <p>No campaigns to display.</p>
     {% endif %}
 
-    <p><a href="{% url 'characters:create_campaign' %}" class="btn btn-primary">Create a New Campaign</a></p>
-
-    <p><a href="{% url 'characters:campaign_list' %}" class="btn btn-link">Browse Campaigns</a></p>
 </div>
 {% endblock %}
