@@ -22,13 +22,24 @@
     
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mx-auto"> <!-- Center the navigation links -->
-                <!-- Create New Character and Campaign Links -->
-                <li class="nav-item">
-                    <a class="btn btn-primary" href="{% url 'characters:create_character' %}">Create a New Character</a>
-                </li>
-                <li class="nav-item mx-2"> <!-- Added mx-2 for spacing between buttons -->
-                    <a class="btn btn-primary" href="{% url 'characters:create_campaign' %}">Create a New Campaign</a>
-                </li>
+                {% if user.is_authenticated %}
+                    <!-- Display for logged-in users -->
+                    <!-- Create New Character and Campaign Links -->
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="{% url 'characters:create_character' %}">Create a New Character</a>
+                    </li>
+                    <li class="nav-item mx-2"> <!-- Added mx-2 for spacing between buttons -->
+                        <a class="btn btn-primary" href="{% url 'characters:create_campaign' %}">Create a New Campaign</a>
+                    </li>
+                {% else %}
+                    <!-- Display for logged-out users -->
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="btn btn-link" href="{% url 'characters:campaign_list' %}">Browse Campaigns</a>
                 </li>

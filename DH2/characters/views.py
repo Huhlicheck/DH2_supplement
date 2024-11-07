@@ -121,7 +121,7 @@ def delete_character(request, character_name):
 
 
 
-@login_required
+
 def campaign_list(request):
     campaigns = Campaign.objects.all()
     return render(request, "characters/campaign_list.html", {
