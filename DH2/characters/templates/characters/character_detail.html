@@ -1,54 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ character.name }} - Details</title>
-</head>
-<body>
-    <h1>{{ character.name }}</h1>
-    <p><strong>Homeworld:</strong> {{ character.character_homeworld }}</p>
-    <p><strong>Background:</strong> {{ character.character_background }}</p>
-    <p><strong>Role:</strong> {{ character.character_role }}</p>
-    <p><strong>Experience to spend:</strong> {{ character.experience_to_spend }}</p>
-    <p><strong>Experience total:</strong> {{ character.experience_total }}</p>
-    <p><strong>Wounds:</strong> {{ character.wounds }}</p>
-    <p><strong>Fatigue:</strong> {{ character.fatigue }}</p>
+{% extends 'base.html' %}
 
-    <h2>Aptitudes</h2>
-    <ul>
-        {% for aptitude in character.character_role.aptitudes.all %}
-            <li>{{ aptitude.name }}</li>
-        {% empty %}
-            <li>No aptitudes available.</li>
-        {% endfor %}
-    </ul>
+{% block title %}{{ character.name }} - Details{% endblock %}
 
-    <h2>Attributes</h2>
-    <ul>
-        {% for attribute in character.attributes.all %}
-            <li>{{ attribute.attribute_type.name }}: {{ attribute.value }}</li>
-        {% empty %}
-            <li>No attributes available.</li>
-        {% endfor %}
-    </ul>
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ character.name }}</h1>
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Character Information</h5>
+            <p><strong>Homeworld:</strong> {{ character.character_homeworld }}</p>
+            <p><strong>Background:</strong> {{ character.character_background }}</p>
+            <p><strong>Role:</strong> {{ character.character_role }}</p>
+            <p><strong>Experience to Spend:</strong> {{ character.experience_to_spend }}</p>
+            <p><strong>Experience Total:</strong> {{ character.experience_total }}</p>
+            <p><strong>Wounds:</strong> {{ character.wounds }}</p>
+            <p><strong>Fatigue:</strong> {{ character.fatigue }}</p>
+        </div>
+    </div>
 
-    <h2>Skills</h2>
-    <ul>
-        {% for skill in visible_skills %}
-            <li>{{ skill.skill.name }} (Level: {{ skill.level }})</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'characters:skill_upgrade_list' character.id %}">Purchase/Increase Skills</a>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Aptitudes</h5>
+            <ul class="list-group">
+                {% for aptitude in character.character_role.aptitudes.all %}
+                    <li class="list-group-item">{{ aptitude.name }}</li>
+                {% empty %}
+                    <li class="list-group-item">No aptitudes available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-    <h2>Inventory</h2>
-    <ul>
-        {% for item in character.inventory.all %}
-            <li>{{ item.item.name }} - Quantity: {{ item.quantity }}{% if item.equipped %} (Equipped){% endif %}</li>
-        {% empty %}
-            <li>No items in inventory.</li>
-        {% endfor %}
-    </ul>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Characteristics</h5>
+            <ul class="list-group">
+                {% for characteristic in character.characteristics.all %}
+                    <li class="list-group-item">{{ characteristic.characteristic_type.name }}: {{ characteristic.value }}</li>
+                {% empty %}
+                    <li class="list-group-item">No characteristics available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-    <a href="{% url 'characters:character_list' %}">Back to Character List</a>
-</body>
-</html>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Skills</h5>
+            <ul class="list-group">
+                {% for skill in visible_skills %}
+                    <li class="list-group-item">{{ skill.skill.name }} (Level: {{ skill.level }})</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'characters:skill_upgrade_list' character.id %}" class="btn btn-primary mt-3">Purchase/Increase Skills</a>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Inventory</h5>
+            <ul class="list-group">
+                {% for item in character.inventory.all %}
+                    <li class="list-group-item">{{ item.item.name }} - Quantity: {{ item.quantity }}{% if item.equipped %} (Equipped){% endif %}</li>
+                {% empty %}
+                    <li class="list-group-item">No items in inventory.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <a href="{% url 'characters:character_list' %}" class="btn btn-secondary">Back to Character List</a>
+</div>
+{% endblock %}

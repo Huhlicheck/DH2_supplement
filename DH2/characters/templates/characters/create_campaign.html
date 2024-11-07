@@ -1,20 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create Campaign</title>
-</head>
-<body>
-    {% block content %}
+{% extends "base.html" %}
+
+{% block title %}Create Campaign{% endblock %}
+
+{% block content %}
+<div class="container my-4">
     <h2>Create a New Campaign</h2>
-  
-    <form method="post" action="{% url 'characters:create_campaign' %}">
-      {% csrf_token %}
-      {{ form.as_p }}  <!-- Renders form fields with labels and validation errors -->
-  
-      <button type="submit" class="btn btn-primary">Create Campaign</button>
+    
+    <form method="post" action="{% url 'characters:create_campaign' %}" class="mt-4">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.as_p }} <!-- Renders form fields with labels and validation errors -->
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Campaign</button>
     </form>
-    <p><a href="{% url 'characters:character_list' %}">Back to Character List</a></p>
-  {% endblock %}
-</body>
-</html>
+    
+    <p class="mt-3">
+    </p>
+</div>
+{% endblock %}

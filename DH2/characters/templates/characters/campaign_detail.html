@@ -1,99 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Your Characters</title>
-</head>
-<body>
-    {% block content %}
+{% extends "base.html" %}
+
+{% block title %}{{ campaign.name }} - Campaign Details{% endblock %}
+
+{% block content %}
+<div class="container my-4">
     <h1>{{ campaign.name }}</h1>
     <p>{{ campaign.description }}</p>
-    <p>Campaign Master: {{ campaign.campaign_master.username }}</p>
+    <p><strong>Campaign Master:</strong> {{ campaign.campaign_master.username }}</p>
     
-    <h2>Characters in Campaign</h2>
-    <ul>
+    <h2 class="mt-4">Characters in Campaign</h2>
+    <ul class="list-group">
         {% for character in campaign_characters %}
-            <li>
-                <!-- Remove Character from Campaign Form -->
-                <form method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="remove_character">
-                    <input type="hidden" name="character_id" value="{{ character.id }}">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this character from the campaign?');">Remove</button>
-                </form>
-
-                <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a> 
-                (Experience Total: {{ character.experience_total }})
-                
-                {% if is_master %}
-                    <!-- Assign Experience Points Form for Individual Character -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{% url 'characters:character_detail' character.name %}" class="font-weight-bold">{{ character.name }}</a> 
+                    <span class="text-muted">(Experience Total: {{ character.experience_total }})</span>
+                </div>
+                <div class="btn-group">
+                    <!-- Remove Character from Campaign Form -->
                     <form method="post" style="display:inline;">
                         {% csrf_token %}
-                        <input type="hidden" name="action" value="assign_experience">
+                        <input type="hidden" name="action" value="remove_character">
                         <input type="hidden" name="character_id" value="{{ character.id }}">
-                        <label for="experience_points_{{ character.id }}">Experience Points:</label>
-                        <input type="number" name="experience_points" id="experience_points_{{ character.id }}" required>
-                        <button type="submit">Assign</button>
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this character from the campaign?');">Remove</button>
                     </form>
-                {% endif %}
+                    
+                    {% if is_master %}
+                        <!-- Assign Experience Points Form for Individual Character -->
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="assign_experience">
+                            <input type="hidden" name="character_id" value="{{ character.id }}">
+                            <div class="form-inline">
+                                <input type="number" name="experience_points" class="form-control form-control-sm" placeholder="XP" required>
+                                <button type="submit" class="btn btn-outline-primary btn-sm ml-2">Assign</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
             </li>
         {% endfor %}
     </ul>
+    
     {% if is_master %}
-    <h2>Assign Experience Points to All Characters</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="assign_experience_all">
-            <input type="hidden" name="character_id" value="{{ character.id }}">
-            <label for="experience_points">Experience Points for All Characters:</label>
-            <input type="number" name="experience_points" id="experience_points_{{ character.id }}" required>
-            <button type="submit">Assign to All Characters</button>
-        </form>
+    <h2 class="mt-4">Assign Experience Points to All Characters</h2>
+    <form method="post" class="form-inline">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="assign_experience_all">
+        <input type="number" name="experience_points" class="form-control mr-2" placeholder="XP for All" required>
+        <button type="submit" class="btn btn-primary">Assign to All Characters</button>
+    </form>
     {% endif %}
 
-    <!-- Request to Join Campaign (for user's characters not in campaign) -->
-    <h2>Your Characters To Join Campaign</h2>
-    <ul>
+    <h2 class="mt-4">Your Characters To Join Campaign</h2>
+    <ul class="list-group">
         {% for character in user_characters %}
-            <li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
                 <a href="{% url 'characters:character_detail' character.name %}">{{ character.name }}</a>
                 <form method="post" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="request_to_join">
                     <input type="hidden" name="character_id" value="{{ character.id }}">
-                    <button type="submit">Request to Join</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Request to Join</button>
                 </form>
             </li>
         {% endfor %}
     </ul>
 
-    <!-- Pending Requests (Master only) -->
     {% if is_master and pending_requests %}
-        <h2>Pending Join Requests</h2>
-        <ul>
+        <h2 class="mt-4">Pending Join Requests</h2>
+        <ul class="list-group">
             {% for request in pending_requests %}
-                <li>
-                    <a href="{% url 'characters:character_detail' request.name %}">{{ request.name }}</a> (from {{ request.player.username }})
-                    <form method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="approve_request">
-                        <input type="hidden" name="character_id" value="{{ request.id }}">
-                        <button type="submit">Approve</button>
-                    </form>
-                    <form method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="decline_request">
-                        <input type="hidden" name="character_id" value="{{ request.id }}">
-                        <button type="submit">Decline</button>
-                    </form>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <a href="{% url 'characters:character_detail' request.name %}">{{ request.name }}</a> (from {{ request.player.username }})
+                    </span>
+                    <div>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve_request">
+                            <input type="hidden" name="character_id" value="{{ request.id }}">
+                            <button type="submit" class="btn btn-outline-success btn-sm">Approve</button>
+                        </form>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="decline_request">
+                            <input type="hidden" name="character_id" value="{{ request.id }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Decline</button>
+                        </form>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
-
-    {% endblock %}
-
-<p><a href="{% url 'characters:character_list' %}">Back to Character List</a></p>
-
-</body>
-</html>
+</div>
+<p class="mt-4">
+</p>
+{% endblock %}

@@ -4,7 +4,9 @@ from . import views
 
 app_name = "characters"
 urlpatterns = [
-    path("", views.character_list, name="character_list"),
+    path("index/", views.character_list, name="character_list"),
+    path("about/", views.about, name="about"),    
+    path("contact/", views.contact, name="contact"),
     path("create/", views.create_character, name="create_character"),
     path("delete/<str:character_name>/", views.delete_character, name="delete_character"),
     path('campaigns/', views.campaign_list, name="campaign_list"),

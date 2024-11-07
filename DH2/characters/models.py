@@ -50,37 +50,77 @@ class Character(models.Model):
 
 
 
-class AttributeType(models.Model):
+class CharacteristicType(models.Model): 
     name = models.CharField(max_length=50)  # e.g., "Strength", "Dexterity"
-    default_value = models.IntegerField(default=22)  # Default starting value for all characters
+    default_value = models.IntegerField(default=25)  # Default starting value for characteristics
+    max_value = models.IntegerField(default=40)  # Max value during character creation
+
+    # Each characteristic has two aptitudes that provide a discount
+    primary_aptitude = models.ForeignKey(
+        'Aptitude', on_delete=models.SET_NULL, null=True, related_name='primary_characteristics'
+    )
+    secondary_aptitude = models.ForeignKey(
+        'Aptitude', on_delete=models.SET_NULL, null=True, related_name='secondary_characteristics'
+    )
+
+    aptitudes = models.ManyToManyField(
+        'Aptitude', related_name='characteristics', blank=True
+    )
 
     def __str__(self):
         return self.name
 
 
 
-class Attribute(models.Model):
-    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="attributes")
-    attribute_type = models.ForeignKey(AttributeType, on_delete=models.CASCADE)
+
+class Characteristic(models.Model):
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name="characteristics")
+    characteristic_type = models.ForeignKey(CharacteristicType, on_delete=models.CASCADE)
     value = models.IntegerField()
 
     def __str__(self):
-        return f"{self.attribute_type.name}: {self.value} (Character: {self.character.name})"
+        return f"{self.characteristic_type.name}: {self.value} (Character: {self.character.name})"
+
+    def get_upgrade_cost(self):
+        """
+        Calculate the experience cost for upgrading the characteristic value.
+        Each +5 increase costs more XP, with discounts based on aptitudes.
+        """
+        cost_increase = 100  # Base cost for +5 upgrade, will increase for each upgrade
+        max_increase = 40  # Maximum value of the characteristic
+
+        if self.value >= max_increase:
+            raise ValidationError("Characteristic is already at the maximum value.")
+        
+        # Calculate the cost for the next upgrade
+        next_increase = (self.value // 5 + 1) * 5
+        upgrade_cost = cost_increase * (next_increase // 5)  # Scaling cost per level
+
+        # Apply aptitude discount if applicable
+        aptitudes = self.character.aptitudes.values_list('id', flat=True)
+        if self.characteristic_type.primary_aptitude_id in aptitudes and self.characteristic_type.secondary_aptitude_id in aptitudes:
+            return upgrade_cost // 2  # Discount for both aptitudes
+        elif self.characteristic_type.primary_aptitude_id in aptitudes or self.characteristic_type.secondary_aptitude_id in aptitudes:
+            return upgrade_cost  # Partial discount for one aptitude
+
+        return upgrade_cost  # No discount if no aptitudes match
 
 
 
 
 @receiver(post_save, sender=Character)
-def create_default_attributes(sender, instance, created, **kwargs):
+def create_default_characteristics(sender, instance, created, **kwargs):
     if created:
-        for attribute_type in AttributeType.objects.all():
-            Attribute.objects.create(
+        for characteristic_type in CharacteristicType.objects.all():
+            Characteristic.objects.create(
                 character=instance,
-                attribute_type=attribute_type,
-                value=attribute_type.default_value
+                characteristic_type=characteristic_type,
+                value=characteristic_type.default_value
             )
-
             
+        # Give the character 60 points to distribute across characteristics during creation
+        # This can be done with a custom form or logic in the character creation view
+
 @receiver(post_save, sender=Character)
 def add_general_aptitude(sender, instance, created, **kwargs):
     if created:

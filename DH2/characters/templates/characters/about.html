@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">About This Project</h1>
+
+    <p>**A Passion for TTRPGs**</p>
+    <p>Tabletop roleplaying games have been a huge part of my life for as long as I can remember. The joy of gathering around the table with friends, creating characters with depth, and experiencing epic stories together has shaped so many of my memories. From the intricate mechanics to the endless possibilities for storytelling, TTRPGs provide a unique escape and a chance to explore our imaginations in ways that few other experiences can.</p>
+    <p>One game that particularly captured my heart was *Dark Heresy 2nd Edition*, set in the grim and gritty world of Warhammer 40k. As a Game Master (GM), I spent countless hours crafting narratives, guiding players through suspenseful investigations, and watching as their characters grew in power and story. However, when I learned that *Dark Heresy 2e* was discontinued, I felt a deep sense of loss. The game had become a cornerstone of my TTRPG experience, and the thought of it no longer being supported was truly disheartening.</p>
+    
+    <p>**A Way to Cope, a Way to Create**</p>
+    <p>In many ways, this project is my way of coping with that grief. Rather than letting the end of an era diminish my love for *Dark Heresy 2e*, I wanted to create something that would help me, and others, keep the game alive. This site is a labor of love, designed to assist GMs and players alike in managing their campaigns, characters, and adventures in a way that feels both intuitive and immersive.</p>
+    <p>By creating a tool to simplify character management, campaign organization, and XP tracking, I hope to make it easier for players and GMs to enjoy the game without getting bogged down in the logistics. It's my way of ensuring that *Dark Heresy* lives on, even in the absence of official support.</p>
+
+    <p>**What This Page Does**</p>
+    <ul>
+        <li><strong>Character Creation & Management:</strong> Create, manage, and level up your characters with ease. Spend XP to improve your abilities and track your progress throughout the campaign.</li>
+        <li><strong>Campaign Creation & Management:</strong> GMs can create and manage campaigns, invite or remove characters, and assign experience points.</li>
+        <li><strong>XP Tracking & Character Growth:</strong> Keep track of your character's experience, skills, and abilities to ensure growth and development throughout the campaign.</li>
+    </ul>
+
+    <p>**Stretch Goals**</p>
+    <p>While this project has already been a fulfilling endeavor, there are still dreams to be realized. Some stretch goals I’m excited to implement in the future include:</p>
+    <ul>
+        <li><strong>Die Roll Mechanism:</strong> Implementing a die roll feature for different character actions, adding an extra layer of excitement and unpredictability to the game.</li>
+        <li><strong>Campaign Calendar:</strong> A tool for GMs and players to schedule and manage their sessions, ensuring everyone can stay on track with the campaign and make planning easier.</li>
+    </ul>
+
+    <p>**A Labor of Love**</p>
+    <p>This project is a passion project, born out of a desire to keep the spirit of *Dark Heresy 2e* alive. While the official line may have ended, the love for the game continues, and this page is my way of sharing that love with others. Whether you're a seasoned GM or a new player, I hope this site helps you immerse yourself in the rich, dark world of the *Warhammer 40k* universe and keeps the flame of *Dark Heresy* burning bright.</p>
+
+    <p>Thank you for joining me on this journey. I hope it enriches your gaming experience, just as it has enriched mine.</p>
+
+    <p>All Dark Heresy 2e material is © Fantasy Flight Games. This tool is a fan-made project, intended solely for personal use and appreciation of the game.</p>
+
+    <p>If you want to contribute to the project or have any questions, feel free to reach out on our <a href="{% url 'characters:contact' %}">Contact</a> page.</p>
+</div>
+{% endblock %}
+

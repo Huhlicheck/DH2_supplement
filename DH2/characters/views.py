@@ -5,6 +5,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Campaign, Character, Skill, CharacterSkill
 from .forms import CharacterCreationForm, CampaignCreationForm
 
+def about(request):
+    return render(request, 'characters/about.html')
+
+def contact(request):
+    return render(request, 'characters/contact.html')
+
 @login_required
 def character_list(request):
     # Get all characters belonging to the logged-in user

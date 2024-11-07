@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DH2{% endblock %}</title>
+    
+    <!-- Bootstrap CSS (Optional) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'characters:character_list' %}">Back to Active Character and Campaign List</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'characters:about' %}">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'characters:contact' %}">Contact</a></li>
+                <!-- Logout Button -->
+                <li class="nav-item">
+                    <button class="btn btn-outline-danger" id="logoutButton">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-4 py-3 bg-light">
+        <p>&copy; 2024 DH2 Character Supplement. All Rights Reserved.</p>
+        <p>All Dark Heresy 2e material is &copy; Fantasy Flight Games.</p>
+        <p>
+            If you have concerns about your information or privacy, feel free to check out 
+            <a href="https://github.com/Huhlicheck/DH2_supplement.git" target="_blank">the source code for this project</a>.
+        </p>
+    </footer>
+
+    <!-- Bootstrap and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Logout Logic -->
+    <script>
+        document.getElementById("logoutButton").addEventListener("click", function() {
+            // Show confirmation dialog
+            const userConfirmed = confirm("Are you sure you want to log out?");
+            if (userConfirmed) {
+                // Clear session storage or cookies
+                // Example: localStorage.clear();  // Uncomment if using localStorage
+                // Example: sessionStorage.clear(); // Uncomment if using sessionStorage
+                
+                // Optionally, clear cookies if needed
+                // document.cookie = "sessionid=;expires=Thu, 01 Jan 1970 00:00:00 GMT"; // For example to clear the session cookie
+                
+                // Redirect to the login page
+                window.location.href = "{% url 'login' %}";  // Ensure you have the correct login URL here
+            }
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
