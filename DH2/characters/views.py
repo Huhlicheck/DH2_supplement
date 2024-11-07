@@ -154,8 +154,13 @@ def campaign_detail(request, campaign_name):
         except (TypeError, ValueError):
             experience_points = 0
 
+        # Handle experience assignment for all characters separately
+        if action == "assign_experience_all" and is_master:
+            for char in campaign_characters:
+                campaign.assign_experience(char, experience_points)
+
         # Handle individual character actions
-        if character_id:
+        elif character_id:
             character = get_object_or_404(Character, id=character_id)
 
             if action == "assign_experience" and is_master:
@@ -174,11 +179,6 @@ def campaign_detail(request, campaign_name):
             # Remove character (either by owner or master)
             if action == "remove_character" and (character.player == request.user or is_master):
                 campaign.remove_character(character)
-
-            # Distribute experience to all characters
-            if action == "assign_experience_all" and is_master:
-                for character in campaign_characters:
-                    campaign.assign_experience(character, experience_points)
 
         return redirect("characters:campaign_detail", campaign_name=campaign.name)
 
