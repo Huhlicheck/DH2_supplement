@@ -17,9 +17,25 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{% url 'characters:character_list' %}">Back to Active Character and Campaign List</a>
+        <!-- Make the Back to Active Character and Campaign List look like a button -->
+        <a class="btn btn-secondary" href="{% url 'characters:character_list' %}">Back to Active Character and Campaign List</a>
+    
         <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav mx-auto"> <!-- Center the navigation links -->
+                <!-- Create New Character and Campaign Links -->
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="{% url 'characters:create_character' %}">Create a New Character</a>
+                </li>
+                <li class="nav-item mx-2"> <!-- Added mx-2 for spacing between buttons -->
+                    <a class="btn btn-primary" href="{% url 'characters:create_campaign' %}">Create a New Campaign</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-link" href="{% url 'characters:campaign_list' %}">Browse Campaigns</a>
+                </li>
+            </ul>
+    
+            <ul class="navbar-nav"> <!-- Align the About and Contact links to the right -->
+                <!-- Additional Navbar Links -->
                 <li class="nav-item"><a class="nav-link" href="{% url 'characters:about' %}">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'characters:contact' %}">Contact</a></li>
                 <!-- Logout Button -->
